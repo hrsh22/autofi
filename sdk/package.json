@@ -29,6 +29,10 @@
     "./core": {
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.js"
+    },
+    "./synapse": {
+      "types": "./dist/synapse/index.d.ts",
+      "import": "./dist/synapse/index.js"
     }
   },
   "files": [
@@ -44,6 +48,7 @@
   "dependencies": {
     "@filoz/synapse-sdk": "^0.35.3",
     "onlyswaps-js": "^1.0.0-rc5",
+    "uuid": "^11.1.0",
     "viem": "^2.38.6",
     "zod": "^4.1.12"
   },
