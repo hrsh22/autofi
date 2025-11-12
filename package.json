@@ -1,54 +1,18 @@
 {
-  "name": "@autofi",
-  "version": "0.1.0",
-  "description": "AutoFi SDK: OnlySwaps + Filecoin integrations, orchestrators, and agent",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./onlyswaps": {
-      "types": "./dist/onlyswaps/index.d.ts",
-      "import": "./dist/onlyswaps/index.js"
-    },
-    "./filecoin": {
-      "types": "./dist/filecoin/index.d.ts",
-      "import": "./dist/filecoin/index.js"
-    },
-    "./sdk": {
-      "types": "./dist/sdk/index.d.ts",
-      "import": "./dist/sdk/index.js"
-    },
-    "./agent": {
-      "types": "./dist/agent/index.d.ts",
-      "import": "./dist/agent/index.js"
-    },
-    "./core": {
-      "types": "./dist/core/index.d.ts",
-      "import": "./dist/core/index.js"
-    }
-  },
-  "files": [
-    "dist"
+  "name": "filbridge-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "sdk",
+    "frontend",
+    "backend",
+    "test"
   ],
   "scripts": {
-    "build": "tsup",
-    "build:watch": "tsup --watch"
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "dependencies": {
-    "@filoz/synapse-sdk": "^0.35.3",
-    "onlyswaps-js": "^1.0.0-rc5",
-    "viem": "^2.38.6",
-    "zod": "^4.1.12"
-  },
-  "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3"
+    "build:sdk": "cd sdk && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:sdk && npm run build:backend && npm run build:frontend"
   }
 }
+

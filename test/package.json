@@ -1,0 +1,23 @@
+{
+  "name": "@autofi/test",
+  "version": "0.1.0",
+  "description": "Demo script for cross-chain Filecoin storage",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx demo.ts",
+    "fund-credits": "tsx fund-credits.ts",
+    "check-credits": "tsx check-credits.ts",
+    "upload-file": "tsx upload-file.ts",
+    "list-files": "tsx list-files.ts",
+    "download-file": "tsx download-file.ts",
+    "status": "tsx status.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "tsx": "^4.19.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "viem": "^2.38.6"
+  }
+}

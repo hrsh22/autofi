@@ -1,0 +1,47 @@
+{
+  "name": "@filbridge/sdk",
+  "version": "0.1.0",
+  "description": "FilBridge SDK: OnlySwaps + Synapse integrations",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./onlyswaps": {
+      "types": "./dist/onlyswaps/index.d.ts",
+      "import": "./dist/onlyswaps/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./synapse": {
+      "types": "./dist/synapse/index.d.ts",
+      "import": "./dist/synapse/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@filoz/synapse-sdk": "^0.35.3",
+    "onlyswaps-js": "^1.0.0-rc5",
+    "uuid": "^11.1.0",
+    "viem": "^2.38.6",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

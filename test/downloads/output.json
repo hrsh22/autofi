@@ -1,0 +1,11 @@
+{
+    "fileId": "1",
+    "fileName": "test-upload.json",
+    "fileSize": 100,
+    "fileHash": "1234567890",
+    "commp": "1234567890",
+    "providerId": "1234567890",
+    "paymentAmount": "100",
+    "bridgeRequestId": "1234567890",
+    "uploadedAt": 1715555555
+}

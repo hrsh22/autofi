@@ -1,91 +1,131 @@
-# AutoFi
+# FilBridge SDK
 
-Exports (single package with subpaths):
+**Cross-chain Filecoin storage made simple. Upload from any blockchain, no Filecoin wallet needed.**
 
-- `@autofi` (core types, errors, env/network config)
-- `@autofi/onlyswaps` (OnlySwaps: routes, preflight, estimation, service)
-- `@autofi/filecoin` (Synapse + pin client)
-- `@autofi/sdk` (orchestrators)
-- `@autofi/agent` (user-run agent)
+FilBridge SDK combines **Synapse** (Filecoin storage) and **OnlySwaps** (cross-chain bridging) to make decentralized storage accessible from any blockchain.
 
-## Environment
+## 🎯 What Problem Does It Solve?
 
-- `AUTOFI_ENV` = `development` | `production`
-- Pinning: `PIN_ENDPOINT`, `PIN_TOKEN`
-- Agent PK/RPC (optional when not injecting clients):
-    - `PRIVATE_KEY`, `BASE_RPC_URL`, `FILECOIN_RPC_URL`
+Using Filecoin storage traditionally requires:
 
-Network modes:
+- ❌ Filecoin wallet and FIL tokens
+- ❌ Switching networks
+- ❌ Complex payment setup
+- ❌ Understanding Synapse protocol details
 
-- Development: testnets; OnlySwaps supports RUSD routes only; Filecoin Calibration purchases supported via `purchase-only` mode if pre-funded.
-- Production: mainnets; OnlySwaps uses mapped tokens (e.g., Base USDT ↔ Filecoin USDFC).
+**FilBridge solves this** by letting users:
 
-References:
+- ✅ Stay on their preferred chain (Base, Ethereum, Arbitrum, etc.)
+- ✅ Fund credits using ERC20 tokens (USDT/USDC) - converted to USDFC via OnlySwaps
+- ✅ Upload files with a single method call
+- ✅ Pay-per-use pricing based on file size and storage duration
+- ✅ No Filecoin knowledge required
 
-- OnlySwaps networks/tokens: [docs.dcipher.network/networks/onlyswaps](https://docs.dcipher.network/networks/onlyswaps)
-- OnlySwaps intro: [docs.dcipher.network/applications/onlyswaps/introduction/](https://docs.dcipher.network/applications/onlyswaps/introduction/)
-- Filecoin Onchain Cloud: [synapse.filecoin.services/intro/about/](https://synapse.filecoin.services/intro/about/)
+## ✨ Key Features
 
-## Quickstart
+- **🌐 Cross-chain uploads** - Upload from Base, Ethereum, Arbitrum, and more
+- **💳 Manual credit funding** - Use OnlySwaps to convert ERC20 tokens to USDFC credits
+- **📦 Simple API** - One method call: `uploadFile()`
+- **🔐 Decentralized storage** - Files stored on Filecoin via Synapse SDK
+- **💰 Credit system** - Fund credits, then upload multiple files
+- **💵 Pay-per-use** - Costs calculated based on file size and storage duration
+- **📊 Balance tracking** - Monitor credits and transaction history
+- **🔍 File management** - List and download files by CommP
 
-Install (workspace root):
+## 🏗️ Architecture
+
+```
+User on Base (with USDT)
+    ↓
+1. Fund Credits (Manual)
+    ├─ User calls fundCredits()
+    ├─ OnlySwaps bridges ERC20 → USDFC
+    └─ Credits added to user balance
+    ↓
+2. Upload File
+    ├─ SDK calculates cost (file size × duration)
+    ├─ Checks user credit balance
+    ├─ Uploads to backend
+    └─ Backend deducts cost from credits
+    ↓
+Backend API
+    ├─ Uploads to Filecoin (Synapse SDK)
+    └─ Stores file metadata
+    ↓
+Filecoin Storage
+    └─ Files stored with metadata
+```
+
+## 🎨 Demo
+
+### Setup Locally
 
 ```bash
+# 1. Build the SDK
+cd sdk
 npm install
+cp .env.example .env
 npm run build
+
+# 2. Start the backend
+cd ../backend
+npm install
+cp .env.example .env
+npm run dev           # Starts on http://localhost:3001
+
+# 3. Start the frontend
+cd ../frontend
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-Use orchestrator:
+### SDK Usage Example
 
-```ts
-import { StorageTopUpOrchestrator } from "@autofi/sdk";
-import { PinClient } from "@autofi/filecoin";
+```typescript
+import { SynapseStorageClient } from "@filbridge/synapse";
+import { getRouterAddress } from "@filbridge/onlyswaps";
+import { createWalletClient, createPublicClient, http, parseUnits } from "viem";
+import { baseSepolia } from "wagmi/chains";
 
-const orchestrator = new StorageTopUpOrchestrator();
-const pin = new PinClient({ endpoint: process.env.PIN_ENDPOINT!, token: process.env.PIN_TOKEN! });
-
-const plan = await orchestrator.run({
-    env: (process.env.AUTOFI_ENV as "development" | "production") ?? "development",
-    mode: "purchase-only", // dev on Calibration; use 'full' when OnlySwaps route is supported
-    reason: "capacity-topup",
-    tokenSymbol: "RUSD",
-    srcChainId: 84532,
-    dstChainId: 43113,
-    amount: 1000000000000000000n,
-    owner: "0x0000000000000000000000000000000000000000",
-    // wire your implementations:
-    // createIntent, waitForFulfillment, purchaseStorage
-    // @ts-expect-error example only
-    createIntent: async () => ({ intentId: "demo", srcChainId: 84532, dstChainId: 43113, tokenSymbol: "RUSD", amount: 1n }),
-    // @ts-expect-error example only
-    purchaseStorage: async (req) => ({ txHash: "0x", gbPurchased: req.gb }),
-    purchaseGb: 5,
-    pin,
-    dryRun: true
+// Initialize clients
+const storage = new SynapseStorageClient({
+    backendUrl: "http://localhost:3001",
+    walletClient,
+    publicClient,
+    routerAddress: getRouterAddress(baseSepolia.id)
 });
-console.log(plan);
-```
 
-Run agent on user machine:
-
-```ts
-import { AutoFiAgent } from "@autofi/agent";
-
-const agent = new AutoFiAgent({
-    privateKey: process.env.PRIVATE_KEY!,
-    env: (process.env.AUTOFI_ENV as "development" | "production") ?? "development",
-    rpc: { base: process.env.BASE_RPC_URL!, filecoin: process.env.FILECOIN_RPC_URL! },
-    policy: { storageThreshold: 0.9, purchaseAmount: 5 }
+// 1. Fund credits (convert ERC20 to USDFC via OnlySwaps)
+await storage.fundCredits({
+    amount: parseUnits("10", 18), // 10 USDFC
+    userAddress: account.address,
+    sourceChainId: baseSepolia.id,
+    sourceTokenSymbol: "RUSD" // or "USDT"/"USDC" on mainnet
 });
-agent.start();
+
+// 2. Upload file (cost deducted from credits)
+const result = await storage.uploadFile({
+    file: fileData,
+    fileName: "document.pdf",
+    userAddress: account.address,
+    storageDurationDays: 30 // Cost calculated: file size × duration
+});
+
+// List files
+const files = await storage.listFiles(account.address);
+
+// Download file
+const data = await storage.downloadFile(files[0].commp);
 ```
 
-## Build
+## 📚 SDK Modules
 
-```bash
-npm run build
-```
+- **`@filbridge/synapse`** - Filecoin storage client
+- **`@filbridge/onlyswaps`** - Cross-chain token bridging
+- **`@filbridge/core`** - Shared types and utilities
 
-## License
+## 🛠️ Tech Stack
 
-MIT
+- **Synapse SDK** - Filecoin storage integration
+- **OnlySwaps** - Cross-chain token bridging
