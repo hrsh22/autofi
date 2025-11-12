@@ -1,7 +1,7 @@
 {
-  "name": "@autofi/sdk",
+  "name": "@filbridge/sdk",
   "version": "0.1.0",
-  "description": "FilBridge SDK: OnlySwaps + Filecoin integrations, orchestrators, and agent",
+  "description": "FilBridge SDK: OnlySwaps + Synapse integrations",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,18 +13,6 @@
     "./onlyswaps": {
       "types": "./dist/onlyswaps/index.d.ts",
       "import": "./dist/onlyswaps/index.js"
-    },
-    "./filecoin": {
-      "types": "./dist/filecoin/index.d.ts",
-      "import": "./dist/filecoin/index.js"
-    },
-    "./sdk": {
-      "types": "./dist/sdk/index.d.ts",
-      "import": "./dist/sdk/index.js"
-    },
-    "./agent": {
-      "types": "./dist/agent/index.d.ts",
-      "import": "./dist/agent/index.js"
     },
     "./core": {
       "types": "./dist/core/index.d.ts",

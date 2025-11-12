@@ -1,19 +1,18 @@
-# Cross-Chain Filecoin Storage - Test Scripts
+# FilBridge - Test Scripts
 
 This folder contains scripts to demonstrate and test the credit-based Filecoin storage system.
 
 ## Overview
 
-The @autofi/synapse SDK provides a credit-based system for storing files on Filecoin from any blockchain. Users fund their account once with USDFC, then use those credits to upload files. Storage costs are calculated using Synapse SDK's exact formula based on file size and storage duration.
+The filbridge SDK provides a credit-based system for storing files on Filecoin from any blockchain. Users fund their account once with USDFC, then use those credits to upload files. Storage costs are calculated using Synapse SDK's exact formula based on file size and storage duration.
 
 ## Credit System
 
 ### How It Works
 
 1. **Fund Credits**: Bridge USDFC from your wallet (e.g., Base + USDT) to the backend wallet
-2. **Credits Never Expire**: Your balance remains until you use it
-3. **Upload Files**: Each upload deducts credits based on file size and storage duration
-4. **Transparent Costs**: Costs calculated using Synapse's formula: `(fileSize × bytesRate × durationEpochs) + (fileSize × bytesLockup)`
+2. **Upload Files**: Each upload deducts credits based on file size and storage duration
+3. **Transparent Costs**: Costs calculated using Synapse's formula: `(fileSize × bytesRate × durationEpochs) + (fileSize × bytesLockup)`
 
 ### Cost Calculation
 
@@ -50,30 +49,16 @@ npm run build
 Create a `.env` file in the `test` folder:
 
 ```bash
-# Your Base wallet private key (must have USDT for funding)
+# Your Base wallet private key (must have RUSD for funding)
 BASE_SEPOLIA_PRIVATE_KEY=0x...
-
-# Backend configuration
-BACKEND_URL=http://localhost:3001
-BACKEND_FILECOIN_ADDRESS=0x...  # Backend's Filecoin wallet address
-
-# Optional: default user address for scripts
-USER_ADDRESS=0x...
 ```
 
 ### 4. Wallet Funded
 
 Your wallet needs:
 
-- **Base mainnet USDT** (for funding credits + OnlySwaps fees)
+- **Base mainnet RUSD** (for funding credits + OnlySwaps fees)
 - **Base ETH** (for gas fees)
-
-### 5. Backend Wallet Funded
-
-Backend wallet needs:
-
-- **Filecoin USDFC** (deposited in Synapse)
-- **Filecoin FIL** (for gas fees)
 
 ## Available Scripts
 
@@ -264,9 +249,6 @@ npm run demo
 All scripts support these environment variables:
 
 - `BASE_SEPOLIA_PRIVATE_KEY`: Your wallet private key (required for funding and uploading)
-- `BACKEND_URL`: Backend API URL (default: `http://localhost:3001`)
-- `BACKEND_FILECOIN_ADDRESS`: Backend's Filecoin wallet address
-- `USER_ADDRESS`: Default user address for scripts
 
 ## Troubleshooting
 
@@ -278,28 +260,11 @@ You need to fund your account:
 npm run fund-credits -- 1.0
 ```
 
-### "Backend not responding"
-
-Ensure backend is running:
-
-```bash
-cd ../backend
-npm run dev
-```
-
 Check status:
 
 ```bash
 npm run status
 ```
-
-### "Failed to bridge"
-
-Check:
-
-- Your wallet has USDT on Base
-- Your wallet has ETH for gas
-- OnlySwaps has liquidity for your route
 
 ### "File not found after upload"
 
@@ -324,47 +289,12 @@ Lockup cost: 1024 × 1000 = 1,024,000 wei
 Total: 8,848,384,000 wei ≈ 0.0000088 USDFC
 ```
 
-## Testing Tips
-
-### For Development
-
-1. Start with small amounts:
-
-    ```bash
-    npm run fund-credits -- 0.1
-    ```
-
-2. Test with small files first
-
-3. Use short durations (1-7 days) for testing
-
-### For Production
-
-1. Fund adequately based on expected usage
-2. Monitor balance regularly
-3. Set appropriate storage durations
-4. Keep transaction history for auditing
-
 ## Files in This Folder
 
+- `demo.ts` - Full end-to-end demo
 - `fund-credits.ts` - Fund your credit account
 - `check-credits.ts` - Check balance and history
 - `upload-file.ts` - Upload files using credits
 - `list-files.ts` - List user's files
 - `download-file.ts` - Download files by CommP
 - `status.ts` - Check backend status
-- `demo.ts` - Full end-to-end demo
-- `test-upload.json` - Sample file for testing
-
-## Next Steps
-
-After successful setup:
-
-1. Try uploading different file types
-2. Test with various storage durations
-3. Monitor credit usage patterns
-4. Integrate into your application
-
----
-
-**Ready to store on Filecoin from any blockchain!** 🚀
